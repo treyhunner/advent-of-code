@@ -29,3 +29,13 @@ python -m unittest test_day01.py
 # Or run all tests in a directory
 python -m unittest discover -s 2025/day01
 ```
+
+## Creating New Days
+
+Use the automation script to scaffold a new day:
+
+```bash
+python scripts/new_day.py 2
+```
+
+This creates the directory structure and template files for day 2.

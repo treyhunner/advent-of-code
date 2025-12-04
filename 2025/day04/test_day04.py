@@ -3,6 +3,7 @@ import unittest
 import part1
 import part2
 import part2_dict_grid
+import part2_complex_grid
 
 
 class TestDay04(unittest.TestCase):
@@ -21,6 +22,11 @@ class TestDay04(unittest.TestCase):
     def test_part2_with_dictionary_grid(self):
         data = part2_dict_grid.parse_input("sample.txt")
         result = part2_dict_grid.solve(data)
+        self.assertEqual(result, 43)
+
+    def test_part2_with_complex_dictionary_grid(self):
+        data = part2_complex_grid.parse_input("sample.txt")
+        result = part2_complex_grid.solve(data)
         self.assertEqual(result, 43)
 
 

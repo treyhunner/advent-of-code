@@ -5,16 +5,18 @@ from part1 import parse_input, adjacent
 
 
 def remove_rolls(data):
+    """Remove all rolls (@) with fewer than 4 rolls adjacent to them."""
     accessible = 0
     for n, row in enumerate(data):
         for m, item in enumerate(row):
-            if item == "@" and list(adjacent(data, n, m)).count("@") < 4:
+            if item == "@" and adjacent(data, n, m).count("@") < 4:
                 data[n][m] = "x"
                 accessible += 1
     return accessible
 
 
 def solve(data):
+    """Repeadetly remove all removable rolls from the grid."""
     data = [list(row) for row in data]
     accessible = 0
     while removed := remove_rolls(data):

@@ -8,21 +8,25 @@ def parse_input(filename):
 
 
 def adjacent(grid, x, y):
+    """Return the (up to 8) cells adjacent to (x, y)."""
+    items = []
+    before_y, after_y = max(y-1, 0), y+2
     if x > 0:
-        yield from grid[x-1][max(y-1, 0):y+2]
+        items.extend(grid[x-1][before_y:after_y])
     if y > 0:
-        yield grid[x][y-1]
+        items.append(grid[x][y-1])
     if y < len(grid[x]) - 1:
-        yield grid[x][y+1]
+        items.append(grid[x][y+1])
     if x < len(grid) - 1:
-        yield from grid[x+1][max(y-1, 0):y+2]
+        items.extend(grid[x+1][before_y:after_y])
+    return items
 
 
 def solve(data):
     accessible = 0
     for n, row in enumerate(data):
         for m, item in enumerate(row):
-            if item == "@" and list(adjacent(data, n, m)).count("@") < 4:
+            if item == "@" and adjacent(data, n, m).count("@") < 4:
                 accessible += 1
     return accessible
 

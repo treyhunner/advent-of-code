@@ -12,6 +12,10 @@ Each day's solution follows this structure:
 - `input.txt` - Personal puzzle input
 - `README.md` - Notes
 
+Note that the `input.txt` file has been removed for each day because Eric Wastl has asked that input not be shared publicly:
+
+> If you're posting a code repository somewhere, please don't include parts of Advent of Code like the puzzle text or your inputs.
+
 ## Running Solutions
 
 Run a specific day's solution:

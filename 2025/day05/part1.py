@@ -17,8 +17,13 @@ def parse_ranges(ranges):
 
 def solve(data):
     range_lines, available_lines = data.split("\n\n")
-    available_ids = {int(n) for n in available_lines.splitlines()}
     fresh_ranges = parse_ranges(range_lines)
+    available_ids = {
+        int(n)
+        for n in available_lines.splitlines()
+    }
+
+    # The count of available item IDs that are fresh
     return sum(
         any(id_ in range_ for range_ in fresh_ranges)
         for id_ in available_ids

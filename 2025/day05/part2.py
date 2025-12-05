@@ -7,7 +7,7 @@ def parse_input(filename):
 
 
 def parse_ranges(ranges):
-    """Parse range lines into range objects."""
+    """Parse range lines into sorted (start, end) range tuples."""
     return sorted(
         (int(start), int(end) + 1)
         for group in ranges.splitlines()
@@ -18,15 +18,15 @@ def parse_ranges(ranges):
 def solve(data):
     range_lines = data.split("\n\n")[0]
     deduplicated = []
+    last_start = last_end = None
     for start, end in parse_ranges(range_lines):
-        if not deduplicated:
+        if last_end is None or last_end < start:
+            # First range or range that doesn't overlap
             deduplicated.append((start, end))
         else:
-            last_start, last_end = deduplicated[-1]
-            if last_end >= start:
-                deduplicated[-1] = (last_start, max(end, last_end))
-            else:
-                deduplicated.append((start, end))
+            # Last range overlaps with this one
+            deduplicated[-1] = (last_start, max(end, last_end))
+        last_start, last_end = deduplicated[-1]
     return sum(
         end - start
         for start, end in deduplicated

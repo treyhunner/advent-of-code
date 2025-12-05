@@ -18,18 +18,18 @@ def parse_ranges(ranges):
 def solve(data):
     range_lines = data.split("\n\n")[0]
     deduplicated = []
-    last_start = last_end = None
+    previous = None
     for start, end in parse_ranges(range_lines):
-        if last_end is None or last_end < start:
+        if previous is None or previous.stop < start:
             # First range or range that doesn't overlap
-            deduplicated.append((start, end))
+            deduplicated.append(range(start, end))
         else:
             # Last range overlaps with this one
-            deduplicated[-1] = (last_start, max(end, last_end))
-        last_start, last_end = deduplicated[-1]
+            deduplicated[-1] = range(previous.start, max(end, previous.stop))
+        previous = deduplicated[-1]
     return sum(
-        end - start
-        for start, end in deduplicated
+        len(range_)
+        for range_ in deduplicated
     )
 
 

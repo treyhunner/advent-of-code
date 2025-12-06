@@ -3,6 +3,9 @@ import math
 from pathlib import Path
 
 
+OPERATIONS = {"+": sum, "*": math.prod}
+
+
 def parse_input(filename):
     path = Path(__file__).parent / filename
     return [
@@ -12,11 +15,10 @@ def parse_input(filename):
 
 
 def solve(data):
-    functions = {"+": sum, "*": math.prod}
-    answers = []
-    for [*numbers, operation] in zip(*data):
-        answers.append(functions[operation](int(n) for n in numbers))
-    return sum(answers)
+    return sum([
+        OPERATIONS[symbol](int(n) for n in numbers)
+        for [*numbers, symbol] in zip(*data)
+    ])
 
 
 if __name__ == "__main__":

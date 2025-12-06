@@ -1,11 +1,11 @@
 """Day 06 - Part 1"""
-from itertools import groupby
 import math
 from pathlib import Path
 import re
 
 
 OPERATIONS = {"+": sum, "*": math.prod}
+BLANK_RE = re.compile(r"\n *\n")
 
 
 def parse_input(filename):
@@ -17,19 +17,22 @@ def all_spaces(characters):
     return all(c.isspace() for c in characters)
 
 
-def parse_cephalopod_numbers(number_lines):
-    """Return groups of number columns, separated by full space column."""
-    return [
-        [int("".join(digits)) for digits in chars]
-        for is_whitespace, chars in groupby(zip(*number_lines), key=all_spaces)
-        if not is_whitespace
-    ]
+def parse_cephalopod_lines(lines):
+    """Transpose rows into columns read right-to-left."""
+    return "\n".join(reversed([
+        "".join(column)
+        for column in zip(*lines)
+    ]))
 
 
 def solve(data):
-    [*number_lines, operators_line] = data
-    symbols = operators_line.split()
-    number_groups = parse_cephalopod_numbers(number_lines)
+    [*number_lines, symbol_line] = data
+    transposed_lines = parse_cephalopod_lines(number_lines)
+    symbols = list(reversed(symbol_line.split()))
+    number_groups = [
+        [int(n) for n in line.split()]
+        for line in BLANK_RE.split(transposed_lines)  # split by blank line
+    ]
     return sum([
         OPERATIONS[symbol](numbers)
         for numbers, symbol in zip(number_groups, symbols)

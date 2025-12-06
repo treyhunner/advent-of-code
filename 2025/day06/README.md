@@ -14,3 +14,5 @@ I enjoyed having excuses to:
 My initial part 2 was pretty nasty looking.
 I eventually refactored it to use `itertools.groupby` and to embrace comprehensions more heavily.
 It's pretty dense now, but I actually think it's a bit more readable now.
+
+I then decided that splitting by blank lines by using a regular expression was probably more easier to understand than using `groupby`.

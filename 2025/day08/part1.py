@@ -41,14 +41,15 @@ def solve(data, steps):
         Point.from_string(line)
         for line in data
     ]
-    pairs = {}
-    for p in points:
-        for q in points:
-            pairs[tuple(sorted([p, q]))] = (p-q).magnitude
+    pairs = {
+        frozenset((p, q)): (p-q).magnitude
+        for p in points
+        for q in points
+        if p is not q
+    }
     distances = deque(sorted(
         (distance, p, q)
         for (p, q), distance in pairs.items()
-        if p is not q
     ))
     points_to_circuits = {
         p: {p}
@@ -56,16 +57,17 @@ def solve(data, steps):
     }
     for _ in range(steps):
         distance, p, q = distances.popleft()
-        if points_to_circuits[p] is points_to_circuits[q]:
-            continue
-        else:
+        if points_to_circuits[p] is not points_to_circuits[q]:
             to_merge = points_to_circuits[q]
             points_to_circuits[p] |= to_merge
-            for point in to_merge:
-                points_to_circuits[point] = points_to_circuits[p]
-    unique_circuits = set(frozenset(c) for c in points_to_circuits.values())
-    largest_lengths = nlargest(3, [len(c) for c in unique_circuits])
-    return prod(largest_lengths)
+            circuit = points_to_circuits[p]
+            points_to_circuits |= {point: circuit for point in to_merge}
+    unique_circuits = {
+        frozenset(c)
+        for c in points_to_circuits.values()
+    }
+    largest_3_lengths = nlargest(3, [len(c) for c in unique_circuits])
+    return prod(largest_3_lengths)
 
 
 if __name__ == "__main__":

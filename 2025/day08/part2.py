@@ -25,15 +25,18 @@ def solve(data):
         p: {p}
         for p in points
     }
-    unique_circuits = [ref(c) for c in points_to_circuits.values()]
-    while sum(r() is not None for r in unique_circuits) > 1:
+    unique_circuits = list(points_to_circuits.values())
+    while len(unique_circuits) > 1:
         distance, p, q = distances.popleft()
         if points_to_circuits[p] is not points_to_circuits[q]:
+            circuit = points_to_circuits[p]
             to_merge = points_to_circuits[q]
             points_to_circuits[p] |= to_merge
-            circuit = points_to_circuits[p]
-            points_to_circuits |= {point: circuit for point in to_merge}
-            del to_merge  # delete last remaining reference
+            points_to_circuits |= {
+                point: circuit
+                for point in to_merge
+            }
+            unique_circuits.remove(to_merge)
     return p.x * q.x
 
 

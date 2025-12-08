@@ -1,5 +1,5 @@
 """Day 08 - Part 1"""
-from collections import deque
+from itertools import combinations
 from pathlib import Path
 from weakref import ref
 
@@ -11,33 +11,23 @@ def solve(data):
         Point.from_string(line)
         for line in data
     ]
-    pairs = {
-        frozenset((p, q)): (p-q).magnitude
-        for p in points
-        for q in points
-        if p is not q
-    }
-    distances = deque(sorted(
-        (distance, p, q)
-        for (p, q), distance in pairs.items()
-    ))
+    distances = sorted(
+        ((p-q).magnitude, p, q)
+        for p, q in combinations(points, 2)
+    )
     points_to_circuits = {
         p: {p}
         for p in points
     }
     unique_circuits = list(points_to_circuits.values())
-    while len(unique_circuits) > 1:
-        distance, p, q = distances.popleft()
+    for distance, p, q in distances:
         if points_to_circuits[p] is not points_to_circuits[q]:
-            circuit = points_to_circuits[p]
-            to_merge = points_to_circuits[q]
+            circuit, to_merge = points_to_circuits[p], points_to_circuits[q]
             points_to_circuits[p] |= to_merge
-            points_to_circuits |= {
-                point: circuit
-                for point in to_merge
-            }
+            points_to_circuits |= dict.fromkeys(to_merge, circuit)
             unique_circuits.remove(to_merge)
-    return p.x * q.x
+        if len(unique_circuits) == 1:
+            return p.x * q.x
 
 
 if __name__ == "__main__":

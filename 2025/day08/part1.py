@@ -2,6 +2,7 @@
 from collections import deque
 from dataclasses import dataclass
 from heapq import nlargest
+from itertools import combinations
 from math import prod, sqrt
 from pathlib import Path
 
@@ -11,9 +12,6 @@ class Point:
     x: int
     y: int
     z: int
-
-    def __str__(self):
-        return f"{self.x},{self.y},{self.z}"
 
     def __sub__(self, other):
         match other:
@@ -41,15 +39,9 @@ def solve(data, steps):
         Point.from_string(line)
         for line in data
     ]
-    pairs = {
-        frozenset((p, q)): (p-q).magnitude
-        for p in points
-        for q in points
-        if p is not q
-    }
     distances = deque(sorted(
-        (distance, p, q)
-        for (p, q), distance in pairs.items()
+        ((p-q).magnitude, p, q)
+        for p, q in combinations(points, 2)
     ))
     points_to_circuits = {
         p: {p}
@@ -58,10 +50,9 @@ def solve(data, steps):
     for _ in range(steps):
         distance, p, q = distances.popleft()
         if points_to_circuits[p] is not points_to_circuits[q]:
-            to_merge = points_to_circuits[q]
+            circuit, to_merge = points_to_circuits[p], points_to_circuits[q]
             points_to_circuits[p] |= to_merge
-            circuit = points_to_circuits[p]
-            points_to_circuits |= {point: circuit for point in to_merge}
+            points_to_circuits |= dict.fromkeys(to_merge, circuit)
     unique_circuits = {
         frozenset(c)
         for c in points_to_circuits.values()

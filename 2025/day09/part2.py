@@ -23,48 +23,37 @@ def area_between(point1, point2):
     return (abs((x2 - x1)) + 1) * (abs(y2 - y1) + 1)
 
 
-def segment_range(a, b, exclusive=False):
-    """Return a range between two numbers."""
-    a, b = sorted((a, b))
-    if exclusive:
-        return range(a+1, b)
-    else:
-        return range(a, b+1)
-
-
-def crosses(n, segments):
-    """Return True if n is within the (start, end) segment."""
-    return any(
-        n in s
-        for s in segments
-    )
-
-
 def solve(data):
     reds = [
         Point(*(int(n) for n in line.split(",")))
         for line in data
     ]
 
-    x_segments = defaultdict(list)
-    y_segments = defaultdict(list)
+    vertical_edges = []
+    horizontal_edges = []
     for a, b in pairwise([*reds, reds[0]]):
         if a.x == b.x:
-            x_segments[a.x].append(segment_range(a.y, b.y))
+            y1, y2 = sorted((a.y, b.y))
+            vertical_edges.append((a.x, y1, y2))
         else:
-            y_segments[a.y].append(segment_range(a.x, b.x))
+            x1, x2 = sorted((a.x, b.x))
+            horizontal_edges.append((a.y, x1, x2))
 
     def boundaries_are_inside(a, b):
-        for x in segment_range(a.x, b.x, exclusive=True):
-            if crosses(a.y, x_segments[x]):
-                return False
-            if crosses(b.y, x_segments[x]):
-                return False
-        for y in segment_range(a.y, b.y, exclusive=True):
-            if crosses(a.x, y_segments[y]):
-                return False
-            if crosses(b.x, y_segments[y]):
-                return False
+        # Chat GPT fixed the logic in this function for me
+        x_low, x_high = sorted((a.x, b.x))
+        y_low, y_high = sorted((a.y, b.y))
+        for x_edge, y1, y2 in vertical_edges:
+            if x_low < x_edge < x_high:
+                if max(y_low, y1) < min(y_high, y2):
+                    # Open-interval overlap in Y
+                    return False
+        for y_edge, x1, x2 in horizontal_edges:
+            if y_low < y_edge < y_high:
+                if max(x_low, x1) < min(x_high, x2):
+                    # Open-interval overlap in X
+                    return False
+
         return True
 
     biggest_area = 1

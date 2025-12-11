@@ -1,6 +1,17 @@
+#!/usr/bin/env uvrs
+# /// script
+# dependencies = [
+#     "pulp",
+# ]
+#
+# [tool.uv]
+# exclude-newer = "2025-12-11T07:07:50Z"
+# ///
 """Day 10 - Part 2"""
 from pathlib import Path
-from itertools import product
+
+from pulp import LpProblem, LpMinimize, LpInteger, LpVariable, lpSum, PULP_CBC_CMD
+
 from part1 import parse_button
 
 
@@ -16,28 +27,26 @@ def parse_joltages(joltage_string):
 
 
 def fewest_presses(joltages, buttons):
-    max_presses = []
-    for button in buttons:
-        max_presses.append(min(
-            joltage
-            for i, joltage in enumerate(joltages)
-            if button & (1 << i)
-        ))
+    model = LpProblem("joltage", LpMinimize)  # We're minimizing presses
 
-    press_ranges = [
-        range(presses+1)
-        for presses in max_presses
+    # Variables: presses for each button (non-negative integers)
+    press_variables = [
+        LpVariable(f"button{i}", lowBound=0, cat=LpInteger)
+        for i in range(len(buttons))
     ]
-    press_counts = []
-    for counts in product(*press_ranges):
-        joltage_counts = [0 for _ in joltages]
-        for button, presses in zip(buttons, counts):
-            for i in range(len(joltages)):
-                if button & (1 << i):
-                    joltage_counts[i] += presses
-        if joltage_counts == joltages:
-            press_counts.append(sum(counts))
-    return min(press_counts)
+
+    # Constraints: for each joltage
+    for i, joltage in enumerate(joltages):
+        model += lpSum(
+            variable * bool(button & (1 << i))
+            for variable, button in zip(press_variables, buttons)
+        ) == joltage
+
+    # Objectives: minimize total button presses
+    model += lpSum(press_variables)
+
+    model.solve(PULP_CBC_CMD(msg=False))
+    return int(sum(v.value() for v in press_variables))
 
 
 def solve(data):

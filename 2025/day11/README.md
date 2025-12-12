@@ -4,4 +4,5 @@
 
 Part 1 was a bit fun because I rarely have an excuse to use recursion.
 
-Part 2 is ridiculously slow and I may give up on it.
+Part 2 turned out to be much simpler than I expected.
+I was doing all sorts of fancy stuff that wasn't needed, but it was just another recursive search.

@@ -16,11 +16,16 @@ def next_devices(devices, current_devices):
 
 def steps_from(devices, start, end):
     steps = [step := {start}]
-    while end not in step:
+    while step:
         steps.append(step := set(next_devices(devices, steps[-1])))
-        if not step:
-            raise ValueError("No valid path")
-    return steps
+    step_options = {
+        count: steps[:count]
+        for count, step in enumerate(steps, start=1)
+        if end in step
+    }
+    if not step_options:
+        raise ValueError("No valid paths")
+    return step_options
 
 
 def solve(data):
@@ -33,12 +38,16 @@ def solve(data):
             backward.setdefault(to_device, set()).add(device)
 
     def paths_between(start, end):
-        steps_there = steps_from(forward, start, end)
-        steps_back = steps_from(backward, end, start)
-        return prod(
-            len(there & back)
-            for there, back in zip(steps_there, reversed(steps_back))
-        )
+        step_options_there = steps_from(forward, start, end)
+        step_options_back = steps_from(backward, end, start)
+        paths = 0
+        for count, steps_there in step_options_there.items():
+            steps_back = step_options_back[count]
+            paths += prod(
+                len(there & back)
+                for there, back in zip(steps_there, reversed(steps_back))
+            )
+        return paths
 
     return (
         paths_between("svr", "fft") *
